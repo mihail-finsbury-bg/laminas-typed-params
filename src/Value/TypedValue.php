@@ -97,6 +97,45 @@ class TypedValue
         return $value;
     }
 
+    public function asFloat(): float
+    {
+        $value = $this->asFloatOrNull();
+        Assert::notNull($value);
+
+        return $value;
+    }
+
+    public function asFloatOrNull(): ?float
+    {
+        Assert::nullOrFloat($this->value);
+
+        return null !== $this->value
+            ? (float) $this->value
+            : null;
+    }
+
+    /** @psalm-return positive-int */
+    public function asPositiveFloat(): float
+    {
+        $value = $this->asPositiveFloatOrNull();
+        Assert::notNull($value);
+
+        return $value;
+    }
+
+    /**
+     * @psalm-return positive-int|null
+     * @psalm-suppress MoreSpecificReturnType
+     */
+    public function asPositiveFloatOrNull(): ?float
+    {
+        $value = $this->asFloatOrNull();
+        Assert::nullOrGreaterThan($value, 0);
+
+        /** @psalm-suppress LessSpecificReturnStatement */
+        return $value;
+    }
+
     public function asString(): string
     {
         $value = $this->asStringOrNull();
