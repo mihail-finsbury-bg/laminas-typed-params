@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Reinfi\TypedParams\Value;
 
+use DateTime;
 use DateTimeImmutable;
 use Exception;
 use TypeError;
@@ -178,6 +179,29 @@ class TypedValue
         Assert::allStringNotEmpty($this->value);
 
         return array_values($this->value);
+    }
+
+    public function asDateTime(?string $format = null): DateTime
+    {
+        $value = $this->asNonEmptyString();
+
+        try {
+            $date = $format !== null
+                ? DateTime::createFromFormat($format, $value)
+                : new DateTime($value);
+        } catch (Exception $e) {
+            throw new TypeError(sprintf('"%s" is not a valid date string.', $value), 412, $e);
+        }
+
+        if(!$date instanceof DateTime) {
+            if($format !== null) {
+                throw new TypeError(sprintf('Invalid date "%s" with format "%s"', $value, $format), 412);
+            }
+
+            throw new TypeError(sprintf('"%s" is not a valid date string.', $value), 412);
+        }
+
+        return $date;
     }
 
     public function asDateTimeImmutable(?string $format = null): DateTimeImmutable
